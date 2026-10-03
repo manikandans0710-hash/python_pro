@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Pro</title>
+<style>
+:root{--a:#66d17a;--bg:#070b14;--card:#0e1523;--line:rgba(255,255,255,.09);--text:#f4f7fb;--muted:#8d9caf}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 5%,color-mix(in srgb,var(--a) 17%,transparent),transparent 30%),radial-gradient(circle at 90% 90%,color-mix(in srgb,var(--a) 12%,transparent),transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;padding:22px}
+.app{width:min(980px,100%);height:min(760px,calc(100vh - 44px));min-height:610px;background:rgba(14,21,35,.91);border:1px solid var(--line);border-radius:30px;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;box-shadow:0 30px 100px #0009;backdrop-filter:blur(20px)}
+header{padding:23px 27px;border-bottom:1px solid var(--line);display:flex;gap:15px;align-items:center}
+.logo{width:55px;height:55px;border-radius:17px;display:grid;place-items:center;font-size:23px;font-weight:800;background:color-mix(in srgb,var(--a) 15%,transparent);border:1px solid color-mix(in srgb,var(--a) 45%,transparent);color:var(--a);box-shadow:0 0 35px color-mix(in srgb,var(--a) 15%,transparent)}
+h1{margin:0;font-size:21px}.tag{margin:5px 0 0;color:var(--muted);font-size:13px}.online{margin-left:auto;font-size:11px;color:var(--muted)}.online i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--a);box-shadow:0 0 12px var(--a);margin-right:6px}
+#chat{overflow:auto;padding:27px}.msg{max-width:78%;margin-bottom:18px}.msg.user{margin-left:auto}.who{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:0 0 6px 4px}.bubble{white-space:pre-wrap;line-height:1.65;font-size:14px;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:#142033}.user .bubble{background:color-mix(in srgb,var(--a) 16%,#111d2d);border-color:color-mix(in srgb,var(--a) 28%,transparent);border-bottom-right-radius:5px}.bot .bubble{border-bottom-left-radius:5px}
+footer{padding:17px 21px 21px;border-top:1px solid var(--line)}form{display:flex;gap:10px;padding:7px;border:1px solid var(--line);border-radius:18px;background:#ffffff08}textarea{flex:1;resize:none;max-height:125px;border:0;outline:0;background:transparent;color:var(--text);padding:12px;font:inherit}textarea::placeholder{color:#68788d}button{min-width:96px;border:0;border-radius:13px;background:var(--a);color:#071018;font-weight:850;cursor:pointer}button:disabled{opacity:.5}.hint{color:#65758a;font-size:10px;margin:8px 4px 0}
+@media(max-width:650px){body{padding:0}.app{height:100vh;min-height:0;border-radius:0}header{padding:18px}.online{display:none}#chat{padding:18px}.msg{max-width:90%}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><div class="logo">🐍</div><div><h1>Python Pro</h1><p class="tag">Focused Python Programming study assistant</p></div><div class="online"><i></i>Gemini 3.1 Flash-Lite</div></header>
+<section id="chat"></section>
+<footer><form id="form"><textarea id="input" rows="1" placeholder="Ask a Python Programming study question..."></textarea><button id="send">Send</button></form><div class="hint">Domain-focused study assistant • Unrelated questions are declined.</div></footer>
+</main>
+<script>
+const chat=document.getElementById("chat"),form=document.getElementById("form"),input=document.getElementById("input"),send=document.getElementById("send");
+add("bot","Hi! I’m Python Pro. Ask me a study question about Python Programming.");
+function add(role,text){const x=document.createElement("div");x.className="msg "+role;const w=document.createElement("div");w.className="who";w.textContent=role==="user"?"You":"Python Pro";const b=document.createElement("div");b.className="bubble";b.textContent=text;x.append(w,b);chat.append(x);chat.scrollTop=chat.scrollHeight;return x}
+input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,125)+"px"});
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+form.addEventListener("submit",async e=>{e.preventDefault();const m=input.value.trim();if(!m||send.disabled)return;add("user",m);input.value="";input.style.height="auto";send.disabled=true;send.textContent="...";const t=add("bot","Thinking...");
+try{const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:m})});const d=await r.json();t.remove();add("bot",d.answer||d.error||"Something went wrong.")}catch(err){t.remove();add("bot","Unable to reach the chatbot server. Please try again.")}finally{send.disabled=false;send.textContent="Send";input.focus()}});
+</script>
+</body>
+</html>
